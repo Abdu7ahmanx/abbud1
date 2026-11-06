@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>رفوف — مكتبة الكتب المشتركة</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10111c;
+      --panel: #191b2b;
+      --text: #f4f2ff;
+      --muted: #b7b5ca;
+      --accent: #b79cff;
+      --accent2: #69e2ce;
+      --danger: #ff8798;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 5%, #604d9940, transparent 35%),
+        radial-gradient(ellipse at 90% 20%, #1f8b8040, transparent 32%),
+        var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+    button, input, textarea, select { font: inherit; }
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 15px;
+      color: #171323;
+      background: var(--accent);
+      font-weight: 700;
+    }
+    button.secondary { background: #303248; color: var(--text); }
+    button.danger { background: #562b3a; color: #ffdce2; }
+    button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    a { color: inherit; text-decoration: none; }
+    header {
+      position: sticky; top: 0; z-index: 5;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px max(5vw, 18px);
+      background: #10111ce8; backdrop-filter: blur(14px);
+      border-bottom: 1px solid #ffffff14;
+    }
+    .brand { font-size: 1.35rem; font-weight: 850; color: var(--accent); }
+    nav { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); }
+    nav a:hover { color: white; }
+    .actions { display: flex; gap: 8px; align-items: center; }
+    main { width: min(1100px, 92%); margin: auto; }
+    .hero {
+      position: relative; overflow: hidden;
+      margin: 34px 0; padding: clamp(28px, 7vw, 72px);
+      border: 1px solid #ffffff18; border-radius: 26px;
+      background: linear-gradient(125deg, #27223fdd, #142d32dd);
+      animation: appear .8s ease both;
+    }
+    .hero::before, .hero::after {
+      content: ""; position: absolute; width: 220px; height: 220px;
+      border-radius: 50%; filter: blur(55px); opacity: .42;
+      animation: float 7s ease-in-out infinite alternate;
+    }
+    .hero::before { background: #a77cff; top: -90px; inset-inline-start: 10%; }
+    .hero::after { background: #4ce0c4; bottom: -120px; inset-inline-end: 8%; animation-delay: -3s; }
+    .hero > * { position: relative; z-index: 1; }
+    h1 { font-size: clamp(2rem, 5vw, 3.7rem); margin: 0 0 12px; }
+    .hero p, .muted { color: var(--muted); line-height: 1.8; }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+    input, textarea, select {
+      background: #111321; color: var(--text);
+      border: 1px solid #ffffff24; border-radius: 10px; padding: 11px 12px;
+      width: 100%;
+    }
+    .toolbar input { max-width: 330px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 16px; }
+    .card, .panel {
+      background: #191b2beF; border: 1px solid #ffffff18;
+      border-radius: 17px; padding: 18px;
+    }
+    .card { transition: transform .2s, border-color .2s; }
+    .card:hover { transform: translateY(-4px); border-color: #b79cff88; }
+    .card h3 { margin: 0 0 5px; }
+    .card p { color: var(--muted); line-height: 1.65; }
+    .meta { color: #c9c2e5; font-size: .9rem; }
+    .card-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .card-buttons button { padding: 8px 11px; }
+    .panel { margin: 25px 0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid .wide { grid-column: 1 / -1; }
+    textarea { min-height: 130px; resize: vertical; }
+    .hidden { display: none !important; }
+    .modal {
+      position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+      padding: 18px; background: #0009;
+    }
+    .modal-box {
+      width: min(460px, 100%); padding: 22px; border-radius: 18px;
+      background: var(--panel); border: 1px solid #ffffff24;
+    }
+    .modal-box form { display: grid; gap: 12px; }
+    .switch { color: var(--accent2); cursor: pointer; }
+    #notice { position: fixed; bottom: 20px; inset-inline-start: 20px;
+      background: #26283a; padding: 12px 17px; border-radius: 12px; display: none; z-index: 20; }
+    footer { padding: 36px 5vw; color: var(--muted); text-align: center; }
+    @keyframes float { to { transform: translate(35px, 25px) scale(1.15); } }
+    @keyframes appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 650px) {
+      header { flex-wrap: wrap; }
+      nav { order: 3; width: 100%; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="#">رفوف</a>
+    <nav>
+      <a href="#explore" data-en="Explore" data-ar="استكشف">استكشف</a>
+      <a href="#share" data-en="Share a book" data-ar="شارك كتاباً">شارك كتاباً</a>
+      <a href="#about" data-en="About" data-ar="عن المكتبة">عن المكتبة</a>
+    </nav>
+    <div class="actions">
+      <button class="secondary" id="langBtn">English</button>
+      <button id="accountBtn">دخول / إنشاء حساب</button>
+      <button class="secondary hidden" id="logoutBtn">خروج</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 data-en="Books are better when shared" data-ar="الكتب أجمل حين نتشاركها">الكتب أجمل حين نتشاركها</h1>
+      <p data-en="Discover books shared by readers, or add a book for the community."
+         data-ar="اكتشف كتباً شاركها القراء، أو أضف كتاباً ليستفيد منه الجميع.">
+        اكتشف كتباً شاركها القراء، أو أضف كتاباً ليستفيد منه الجميع.
+      </p>
+      <a href="#share"><button data-en="Share a book" data-ar="شارك كتاباً">شارك كتاباً</button></a>
+    </section>
+
+    <section id="explore">
+      <div class="section-title">
+        <h2 data-en="Explore the library" data-ar="استكشف المكتبة">استكشف المكتبة</h2>
+        <span id="bookCount" class="muted"></span>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="ابحث عن كتاب أو مؤلف">
+        <select id="categoryFilter">
+          <option value="" data-en="All categories" data-ar="كل التصنيفات">كل التصنيفات</option>
+          <option value="رواية">رواية</option><option value="علوم">علوم</option>
+          <option value="تاريخ">تاريخ</option><option value="أخرى">أخرى</option>
+        </select>
+      </div>
+      <div class="grid" id="bookGrid"></div>
+    </section>
+
+    <section class="panel" id="share">
+      <h2 data-en="Share a book with everyone" data-ar="شارك كتاباً مع الجميع">شارك كتاباً مع الجميع</h2>
+      <p class="muted" data-en="Sign in to add a book. You can enter its text directly; no file upload is needed."
+         data-ar="سجّل الدخول لإضافة كتاب. أدخل نص الكتاب مباشرةً؛ لا حاجة لرفع ملف.">
+        سجّل الدخول لإضافة كتاب. أدخل نص الكتاب مباشرةً؛ لا حاجة لرفع ملف.
+      </p>
+      <form id="bookForm">
+        <input type="hidden" id="editId">
+        <div class="form-grid">
+          <input id="title" required maxlength="100" placeholder="عنوان الكتاب">
+          <input id="author" required maxlength="100" placeholder="اسم المؤلف">
+          <select id="category">
+            <option>أخرى</option><option>رواية</option><option>علوم</option><option>تاريخ</option>
+          </select>
+          <input id="description" maxlength="250" placeholder="وصف مختصر">
+          <textarea class="wide" id="content" required placeholder="اكتب نص الكتاب هنا ليتمكن القراء من طباعته أو حفظه PDF"></textarea>
+          <div class="wide"><button id="submitBook" type="submit">نشر الكتاب</button></div>
+        </div>
+      </form>
+      <p class="muted" id="loginPrompt">يلزم تسجيل الدخول قبل نشر كتاب.</p>
+    </section>
+
+    <section class="panel" id="about">
+      <h2 data-en="About Shelves" data-ar="عن رفوف">عن رفوف</h2>
+      <p class="muted" data-en="A simple community library for sharing reading and discovering new books."
+         data-ar="مكتبة مجتمعية بسيطة لمشاركة القراءة واكتشاف كتب جديدة.">
+        مكتبة مجتمعية بسيطة لمشاركة القراءة واكتشاف كتب جديدة.
+      </p>
+    </section>
+  </main>
+
+  <footer>رفوف — مكتبة يشاركها القراء</footer>
+  <div id="notice"></div>
+
+  <div class="modal hidden" id="authModal">
+    <div class="modal-box">
+      <div class="section-title">
+        <h2 id="authTitle">تسجيل الدخول</h2>
+        <button class="secondary" id="closeModal" type="button">إغلاق</button>
+      </div>
+      <form id="authForm">
+        <input id="email" type="email" required placeholder="البريد الإلكتروني">
+        <input id="password" type="password" required minlength="6" placeholder="كلمة المرور">
+        <button id="authSubmit" type="submit">دخول</button>
+        <span class="switch" id="toggleAuth">إنشاء حساب جديد</span>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_EMAIL = "admin@shelves.test";
+    const ADMIN_PASSWORD = "admin123";
+    const $ = id => document.getElementById(id);
+
+    let books = JSON.parse(localStorage.getItem("shelves_books") || "[]");
+    let users = JSON.parse(localStorage.getItem("shelves_users") || "[]");
+    let currentUser = JSON.parse(sessionStorage.getItem("shelves_user") || "null");
+    let language = localStorage.getItem("shelves_lang") || "ar";
+    let isSignup = false;
+
+    if (!books.length) {
+      books = [
+        { id: crypto.randomUUID(), title: "رحلة القراءة", author: "مكتبة رفوف",
+          category: "أخرى", description: "كتاب تجريبي قصير.", content: "مرحباً بك في مكتبة رفوف.\\n\\nيمكنك مشاركة الكتب مع القراء، وقراءة النص أو حفظه بصيغة PDF.", owner: "رفوف" }
+      ];
+      saveBooks();
+    }
+    function saveBooks() { localStorage.setItem("shelves_books", JSON.stringify(books)); }
+    function saveUsers() { localStorage.setItem("shelves_users", JSON.stringify(users)); }
+    function isAdmin() { return currentUser?.email === ADMIN_EMAIL; }
+    function notify(text) {
+      $("notice").textContent = text; $("notice").style.display = "block";
+      setTimeout(() => $("notice").style.display = "none", 2600);
+    }
+    function setLanguage(lang) {
+      language = lang; localStorage.setItem("shelves_lang", lang);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.querySelectorAll("[data-en][data-ar]").forEach(el => el.textContent = el.dataset[lang]);
+      $("langBtn").textContent = lang === "ar" ? "English" : "العربية";
+      $("searchInput").placeholder = lang === "ar" ? "ابحث عن كتاب أو مؤلف" : "Search books or authors";
+      $("title").placeholder = lang === "ar" ? "عنوان الكتاب" : "Book title";
+      $("author").placeholder = lang === "ar" ? "اسم المؤلف" : "Author";
+      $("description").placeholder = lang === "ar" ? "وصف مختصر" : "Short description";
+      $("content").placeholder = lang === "ar" ? "اكتب نص الكتاب هنا ليتمكن القراء من طباعته أو حفظه PDF" : "Enter the book text here; readers can print or save it as PDF";
+      $("accountBtn").textContent = currentUser ? currentUser.email : (lang === "ar" ? "دخول / إنشاء حساب" : "Sign in / Register");
+      $("logoutBtn").textContent = lang === "ar" ? "خروج" : "Sign out";
+      renderBooks();
+    }
+    function renderBooks() {
+      const q = $("searchInput").value.toLowerCase();
+      const cat = $("categoryFilter").value;
+      const shown = books.filter(b =>
+        (!cat || b.category === cat) &&
+        (b.title + " " + b.author + " " + b.description).toLowerCase().includes(q)
+      );
+      $("bookCount").textContent = `${shown.length} ${language === "ar" ? "كتاب" : "books"}`;
+      $("bookGrid").innerHTML = shown.map(b => `
+        <article class="card">
+          <div class="meta">${escapeHtml(b.category || "أخرى")} · ${language === "ar" ? "بواسطة" : "by"} ${escapeHtml(b.owner || "قارئ")}</div>
+          <h3>${escapeHtml(b.title)}</h3>
+          <div class="meta">${escapeHtml(b.author)}</div>
+          <p>${escapeHtml(b.description || "")}</p>
+          <div class="card-buttons">
+            <button onclick="readBook('${b.id}')">${language === "ar" ? "قراءة" : "Read"}</button>
+            <button class="secondary" onclick="printBook('${b.id}')">${language === "ar" ? "تنزيل PDF" : "Download PDF"}</button>
+            ${isAdmin() ? `<button class="secondary" onclick="editBook('${b.id}')">${language === "ar" ? "تعديل" : "Edit"}</button><button class="danger" onclick="deleteBook('${b.id}')">${language === "ar" ? "حذف" : "Delete"}</button>` : ""}
+          </div>
+        </article>`).join("") || `<p class="muted">${language === "ar" ? "لا توجد كتب مطابقة." : "No matching books."}</p>`;
+      $("loginPrompt").classList.toggle("hidden", !!currentUser);
+      $("bookForm").classList.toggle("hidden", !currentUser);
+      $("accountBtn").textContent = currentUser ? currentUser.email : (language === "ar" ? "دخول / إنشاء حساب" : "Sign in / Register");
+      $("logoutBtn").classList.toggle("hidden", !currentUser);
+    }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+    }
+    function readBook(id) {
+      const b = books.find(x => x.id === id); if (!b) return;
+      const w = window.open("", "_blank");
+      w.document.write(`<meta charset="utf-8"><title>${escapeHtml(b.title)}</title>
+        <style>body{font-family:serif;max-width:760px;margin:50px auto;padding:20px;line-height:1.9;white-space:pre-wrap}</style>
+        <h1>${escapeHtml(b.title)}</h1><h3>${escapeHtml(b.author)}</h3><p>${escapeHtml(b.content)}</p>`);
+      w.document.close();
+    }
+    function printBook(id) {
+      const b = books.find(x => x.id === id); if (!b) return;
+      const w = window.open("", "_blank");
+      w.document.write(`<meta charset="utf-8"><title>${escapeHtml(b.title)}</title>
+        <style>body{font-family:serif;max-width:760px;margin:40px auto;padding:25px;line-height:1.9;white-space:pre-wrap;color:#111}
+        @media print{body{margin:0}}</style><h1>${escapeHtml(b.title)}</h1>
+        <h3>${escapeHtml(b.author)}</h3><p>${escapeHtml(b.content)}</p>`);
+      w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
+    }
+    function editBook(id) {
+      const b = books.find(x => x.id === id); if (!b) return;
+      $("editId").value = b.id; $("title").value = b.title; $("author").value = b.author;
+      $("category").value = b.category || "أخرى"; $("description").value = b.description || "";
+      $("content").value = b.content; $("submitBook").textContent = language === "ar" ? "حفظ التعديلات" : "Save changes";
+      $("share").scrollIntoView({ behavior: "smooth" });
+    }
+    function deleteBook(id) {
+      if (!confirm(language === "ar" ? "هل تريد حذف هذا الكتاب؟" : "Delete this book?")) return;
+      books = books.filter(b => b.id !== id); saveBooks(); renderBooks();
+    }
+
+    $("bookForm").addEventListener("submit", e => {
+      e.preventDefault();
+      if (!currentUser) return notify(language === "ar" ? "سجّل الدخول أولاً." : "Please sign in first.");
+      const id = $("editId").value;
+      const data = { id: id || crypto.randomUUID(), title: $("title").value.trim(),
+        author: $("author").value.trim(), category: $("category").value,
+        description: $("description").value.trim(), content: $("content").value.trim(),
+        owner: currentUser.email };
+      if (id) {
+        const index = books.findIndex(b => b.id === id);
+        if (index >= 0 && (isAdmin() || books[index].owner === currentUser.email)) books[index] = data;
+      } else books.unshift(data);
+      saveBooks(); $("bookForm").reset(); $("editId").value = "";
+      $("submitBook").textContent = language === "ar" ? "نشر الكتاب" : "Publish book";
+      renderBooks(); notify(language === "ar" ? "تم نشر الكتاب في المكتبة." : "Book shared with the library.");
+    });
+
+    $("accountBtn").onclick = () => currentUser ? notify(currentUser.email) : $("authModal").classList.remove("hidden");
+    $("closeModal").onclick = () => $("authModal").classList.add("hidden");
+    $("logoutBtn").onclick = () => {
+      currentUser = null; sessionStorage.removeItem("shelves_user"); renderBooks();
+    };
+    $("toggleAuth").onclick = () => {
+      isSignup = !isSignup;
+      $("authTitle").textContent = isSignup ? (language === "ar" ? "إنشاء حساب" : "Create account") : (language === "ar" ? "تسجيل الدخول" : "Sign in");
+      $("authSubmit").textContent = isSignup ? (language === "ar" ? "إنشاء حساب" : "Register") : (language === "ar" ? "دخول" : "Sign in");
+      $("toggleAuth").textContent = isSignup ? (language === "ar" ? "لديك حساب؟ تسجيل الدخول" : "Have an account? Sign in") : (language === "ar" ? "إنشاء حساب جديد" : "Create an account");
+    };
+    $("authForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const email = $("email").value.trim().toLowerCase(), password = $("password").value;
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        currentUser = { email, role: "admin" };
+      } else if (isSignup) {
+        if (users.some(u => u.email === email)) return notify(language === "ar" ? "هذا البريد مسجل بالفعل." : "Email already registered.");
+        users.push({ email, password }); saveUsers(); currentUser = { email, role: "user" };
+      } else {
+        const user = users.find(u => u.email === email && u.password === password);
+        if (!user) return notify(language === "ar" ? "البريد أو كلمة المرور غير صحيحة." : "Incorrect email or password.");
+        currentUser = { email, role: "user" };
+      }
+      sessionStorage.setItem("shelves_user", JSON.stringify(currentUser));
+      $("authModal").classList.add("hidden"); $("authForm").reset(); renderBooks();
+    });
+    $("searchInput").addEventListener("input", renderBooks);
+    $("categoryFilter").addEventListener("change", renderBooks);
+    $("langBtn").onclick = () => setLanguage(language === "ar" ? "en" : "ar");
+    setLanguage(language);
+  </script>
+</body>
+</html>
